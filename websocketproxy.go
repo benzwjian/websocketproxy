@@ -139,9 +139,13 @@ func (w *WebsocketProxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	// http://tools.ietf.org/html/draft-ietf-hybi-websocket-multiplexing-01
 	wst := transport.GetDefaultWebsocketTransport()
 	wst.RequestHeader = requestHeader
-	_, connBackend, resp, err := gosocketio.Dial(
+	c, connBackend, resp, err := gosocketio.Dial(
 		gosocketio.GetUrl("localhost", 1337, false),
 		wst)
+	c.On(gosocketio.OnConnection, func(h *gosocketio.Channel) {
+		log.Println("Connected")
+	})
+
 	// connBackend, resp, err := dialer.Dial(backendURL.String(), requestHeader)
 	if err != nil {
 		log.Printf("websocketproxy: couldn't dial to remote backend url %s", err)
