@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	gosocketio "github.com/benzwjian/golang-socketio"
 	"github.com/benzwjian/golang-socketio/transport"
@@ -145,7 +146,8 @@ func (w *WebsocketProxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	c.On(gosocketio.OnConnection, func(h *gosocketio.Channel) {
 		log.Println("Connected")
 	})
-
+	log.Println("wait for ws connection")
+	time.Sleep(60 * time.Second)
 	// connBackend, resp, err := dialer.Dial(backendURL.String(), requestHeader)
 	if err != nil {
 		log.Printf("websocketproxy: couldn't dial to remote backend url %s", err)
