@@ -10,6 +10,8 @@ import (
 	"net/url"
 	"strings"
 
+	gosocketio "github.com/benzwjian/golang-socketio"
+	"github.com/benzwjian/golang-socketio/transport"
 	"github.com/gorilla/websocket"
 )
 
@@ -80,10 +82,10 @@ func (w *WebsocketProxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	dialer := w.Dialer
-	if w.Dialer == nil {
-		dialer = DefaultDialer
-	}
+	// dialer := w.Dialer
+	// if w.Dialer == nil {
+	// 	dialer = DefaultDialer
+	// }
 
 	// Pass headers from the incoming request to the dialer to forward them to
 	// the final destinations.
@@ -135,7 +137,12 @@ func (w *WebsocketProxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	// opening a new TCP connection time for each request. This should be
 	// optional:
 	// http://tools.ietf.org/html/draft-ietf-hybi-websocket-multiplexing-01
-	connBackend, resp, err := dialer.Dial(backendURL.String(), requestHeader)
+	wst := transport.GetDefaultWebsocketTransport()
+	wst.RequestHeader = requestHeader
+	_, connBackend, resp, err := gosocketio.Dial(
+		gosocketio.GetUrl("localhost", 1337, false),
+		wst)
+	// connBackend, resp, err := dialer.Dial(backendURL.String(), requestHeader)
 	if err != nil {
 		log.Printf("websocketproxy: couldn't dial to remote backend url %s", err)
 		if resp != nil {
